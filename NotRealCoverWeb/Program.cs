@@ -1,7 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using NotRealCoverWeb.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+
+builder.Services.AddDbContext<NotRealCoverWebContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+
 
 var app = builder.Build();
 
