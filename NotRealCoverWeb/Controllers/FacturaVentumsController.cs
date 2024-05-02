@@ -47,7 +47,16 @@ namespace NotRealCoverWeb.Controllers
         // GET: FacturaVentums/Create
         public IActionResult Create()
         {
-            return View();
+            var facturaVenta = new FacturaVentum();
+            facturaVenta.FechaVenta = DateTime.Now;
+            facturaVenta.TotalVenta = 0;
+            facturaVenta.DetFacturaVenta = new List<DetFacturaVentum>();
+            facturaVenta.DetFacturaVenta.Add(new DetFacturaVentum
+            {
+                Cantidad = 1
+            });
+            ViewBag.Accion = "Create";
+            return View(facturaVenta);
         }
 
         // POST: FacturaVentums/Create
@@ -65,6 +74,34 @@ namespace NotRealCoverWeb.Controllers
             }
             return View(facturaVentum);
         }
+
+        //Metodo agregardetalles
+        [HttpPost]
+        public ActionResult AgregarDetalles([Bind("Id,FechaVenta,Correlativo,Cliente,TotalVenta,DetFacturaVenta")] FacturaVentum facturaVenta, string accion)
+        {
+            facturaVenta.DetFacturaVenta.Add(new DetFacturaVentum { Cantidad = 1 });
+            ViewBag.Accion = accion;
+            return View(accion, facturaVenta);
+        }
+
+        //Metodo EliminarDetalles
+        public ActionResult EliminarDetalles([Bind("Id,FechaVenta,Correlativo,Cliente,TotalVenta,DetFacturaVenta")] FacturaVentum facturaVenta,
+           int index, string accion)
+        {
+            var det = facturaVenta.DetFacturaVenta[index];
+            if (accion == "Edit" && det.Id > 0)
+            {
+                det.Id = det.Id * -1;
+            }
+            else
+            {
+                facturaVenta.DetFacturaVenta.RemoveAt(index);
+            }
+
+            ViewBag.Accion = accion;
+            return View(accion, facturaVenta);
+        }
+
 
         // GET: FacturaVentums/Edit/5
         public async Task<IActionResult> Edit(int? id)
