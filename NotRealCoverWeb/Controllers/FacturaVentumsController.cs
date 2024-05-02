@@ -64,15 +64,16 @@ namespace NotRealCoverWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FechaVenta,Correlativo,Cliente,TotalVenta")] FacturaVentum facturaVentum)
+        public async Task<IActionResult> Create([Bind("Id,FechaVenta,Correlativo,Cliente,TotalVenta,DetFacturaVenta")] FacturaVentum facturaVentum)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(facturaVentum);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(facturaVentum);
+            //Esta linea sirve para que calcule la cantidad al multiplicar PrecioUnitario * Cantidad
+            facturaVentum.TotalVenta = facturaVentum.DetFacturaVenta.Sum(s => s.Cantidad * s.PrecioUnitario);
+
+            _context.Add(facturaVentum);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
+           
         }
 
         //Metodo agregardetalles
