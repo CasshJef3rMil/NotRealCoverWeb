@@ -7,7 +7,7 @@ namespace NotRealCoverWeb.Models
     {
         public FacturaVentum()
         {
-            DetFacturaVenta = new HashSet<DetFacturaVentum>();
+            DetFacturaVenta = new List<DetFacturaVentum>();
         }
 
         public int Id { get; set; }
@@ -16,6 +16,6 @@ namespace NotRealCoverWeb.Models
         public string Cliente { get; set; } = null!;
         public decimal TotalVenta { get; set; }
 
-        public virtual ICollection<DetFacturaVentum> DetFacturaVenta { get; set; }
+        public virtual IList<DetFacturaVentum> DetFacturaVenta { get; set; }
     }
 }
