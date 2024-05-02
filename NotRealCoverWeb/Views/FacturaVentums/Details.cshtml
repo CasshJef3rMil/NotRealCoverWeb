@@ -35,6 +35,9 @@
             @Html.DisplayFor(model => model.TotalVenta)
         </dd>
     </dl>
+    <div class="row row-cols-md-12">
+        @await Html.PartialAsync("_DetFacturaVentas", Model.DetFacturaVenta)
+    </div>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |

@@ -34,14 +34,16 @@ namespace NotRealCoverWeb.Controllers
                 return NotFound();
             }
 
-            var facturaVentum = await _context.FacturaVenta
+            var facturaVenta = await _context.FacturaVenta
+                .Include(s => s.DetFacturaVenta)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (facturaVentum == null)
+
+            if (facturaVenta == null)
             {
                 return NotFound();
             }
-
-            return View(facturaVentum);
+            ViewBag.Accion = "Details";
+            return View(facturaVenta);
         }
 
         // GET: FacturaVentums/Create
