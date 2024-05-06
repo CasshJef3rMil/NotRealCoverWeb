@@ -5,6 +5,8 @@ namespace NotRealCoverWeb.Models
 {
     public partial class DetFacturaVentum
     {
+        
+
         public int Id { get; set; }
         public int IdFacturaVenta { get; set; }
         public string Album { get; set; } = null!;

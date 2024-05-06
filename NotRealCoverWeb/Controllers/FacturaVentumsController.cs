@@ -85,6 +85,8 @@ namespace NotRealCoverWeb.Controllers
             facturaVenta.DetFacturaVenta.Add(new DetFacturaVentum { Cantidad = 1 });
             ViewBag.Accion = accion;
             return View(accion, facturaVenta);
+
+
         }
 
         //Metodo EliminarDetalles
@@ -113,13 +115,18 @@ namespace NotRealCoverWeb.Controllers
             {
                 return NotFound();
             }
+           
+            var facturaVentum = await _context.FacturaVenta
+           .Include(s => s.DetFacturaVenta)
+           .FirstAsync(s => s.Id == id);
 
-            var facturaVentum = await _context.FacturaVenta.FindAsync(id);
             if (facturaVentum == null)
             {
                 return NotFound();
             }
+            ViewBag.Accion = "Edit";
             return View(facturaVentum);
+
         }
 
         // POST: FacturaVentums/Edit/5
@@ -127,52 +134,65 @@ namespace NotRealCoverWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FechaVenta,Correlativo,Cliente,TotalVenta")] FacturaVentum facturaVentum)
-        {
-            if (id != facturaVentum.Id)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FechaVenta,Correlativo,Cliente,TotalVenta,DetFacturaVenta")] FacturaVentum facturaVentum)
+         {
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                // Obtener los datos de la base de datos que van a ser modificados
+                var facturaUpdate = await _context.FacturaVenta
+                        .Include(s => s.DetFacturaVenta)
+                        .FirstAsync(s => s.Id == facturaVentum.Id);
+                facturaUpdate.Correlativo = facturaVentum.Correlativo;
+                facturaUpdate.TotalVenta = facturaVentum.DetFacturaVenta.Where(s => s.Id > -1).Sum(s => s.PrecioUnitario * s.Cantidad);
+                facturaUpdate.Cliente = facturaVentum.Cliente;
+                facturaUpdate.FechaVenta = facturaVentum.FechaVenta;
+                // Obtener todos los detalles que seran nuevos y agregarlos a la base de datos
+                var detNew = facturaVentum.DetFacturaVenta.Where(s => s.Id == 0);
+                // Obtener todos los detalles que seran nuevos y agregarlos a la base de datos
+                foreach (var d in detNew)
                 {
-                    _context.Update(facturaVentum);
-                    await _context.SaveChangesAsync();
+                    facturaUpdate.DetFacturaVenta.Add(d);
                 }
-                catch (DbUpdateConcurrencyException)
+                // Obtener todos los detalles que seran modificados y actualizar a la base de datos
+                var detUpdate = facturaVentum.DetFacturaVenta.Where(s => s.Id > 0);
+                foreach (var d in detUpdate)
                 {
-                    if (!FacturaVentumExists(facturaVentum.Id))
+                    var det = facturaUpdate.DetFacturaVenta.FirstOrDefault(s => s.Id == d.Id);
+                    det.Album = d.Album;
+                    det.Descripcion = d.Descripcion;
+                    det.Cantidad = d.Cantidad;
+                    det.PrecioUnitario = d.PrecioUnitario;
+
+                }
+                // Obtener todos los detalles que seran eliminados y actualizar a la base de datos
+                var delDet = facturaVentum.DetFacturaVenta.Where(s => s.Id < 0).ToList();
+                if (delDet != null && delDet.Count > 0)
+                {
+                    foreach (var d in delDet)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        d.Id = d.Id * -1;
+                        var det = facturaUpdate.DetFacturaVenta.FirstOrDefault(s => s.Id == d.Id);
+                        _context.Remove(det);
+                        // facturaUpdate.DetFacturaVenta.Remove(det);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                // Aplicar esos cambios a la base de datos
+                _context.Update(facturaUpdate);
+                await _context.SaveChangesAsync();
             }
-            return View(facturaVentum);
-        }
-
-        // GET: FacturaVentums/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.FacturaVenta == null)
+            catch (DbUpdateConcurrencyException)
             {
-                return NotFound();
+                if (!FacturaVentumExists(facturaVentum.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
 
-            var facturaVentum = await _context.FacturaVenta
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (facturaVentum == null)
-            {
-                return NotFound();
-            }
-
-            return View(facturaVentum);
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: FacturaVentums/Delete/5
