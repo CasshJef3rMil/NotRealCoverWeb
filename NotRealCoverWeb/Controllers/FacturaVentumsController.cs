@@ -194,7 +194,24 @@ namespace NotRealCoverWeb.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        // GET: FacturaVentums/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null || _context.FacturaVenta == null)
+            {
+                return NotFound();
+            }
+             
+            var facturaVentum = await _context.FacturaVenta       
+                .Include(s => s.DetFacturaVenta)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (facturaVentum == null)
+            {
+                return NotFound();
+            }
+            ViewBag.Accion = "Delete";
+            return View(facturaVentum);
+        }
         // POST: FacturaVentums/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -204,12 +221,15 @@ namespace NotRealCoverWeb.Controllers
             {
                 return Problem("Entity set 'NotRealCoverWebContext.FacturaVenta'  is null.");
             }
-            var facturaVentum = await _context.FacturaVenta.FindAsync(id);
+
+            var facturaVentum = await _context.FacturaVenta
+                .FindAsync(id);
+
             if (facturaVentum != null)
             {
                 _context.FacturaVenta.Remove(facturaVentum);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
