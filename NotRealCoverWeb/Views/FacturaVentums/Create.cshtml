@@ -4,49 +4,59 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<div class="container">
+    <div class="text-center">
+        <h1 class="mt-4">Crear Nueva Factura</h1>
+    </div>
+    <hr />
 
-<h4>FacturaVentum</h4>
-<hr />
-<form asp-action="Create">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="row">
-        <div class="form-group col-md-3">
-            <label asp-for="FechaVenta" class="control-label"></label>
-            <input asp-for="FechaVenta" class="form-control" />
-            <span asp-validation-for="FechaVenta" class="text-danger"></span>
-        </div>
-        <div class="form-group col-md-3">
-            <label asp-for="Correlativo" class="control-label"></label>
-            <input asp-for="Correlativo" class="form-control" />
-            <span asp-validation-for="Correlativo" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="row">
-        <div class="form-group col-md-6">
-            <label asp-for="Cliente" class="control-label"></label>
-            <input asp-for="Cliente" class="form-control" />
-            <span asp-validation-for="Cliente" class="text-danger"></span>
-        </div>
-        <div class="form-group col-md-2">
-            <label  asp-for="TotalVenta" class="control-label"></label>
-            <input readonly asp-for="TotalVenta" class="form-control" />
-            <span asp-validation-for="TotalVenta" class="text-danger"></span>
-        </div>
-      
-    </div>
-    <div class="row row-cols-md-12">
-        @await Html.PartialAsync("_DetFacturaVentas", Model.DetFacturaVenta)
-    </div>
-    <div class="row">
-        <div class="form-group">
-            <input type="submit" value="Crear" class="btn btn-primary" />
-            <a class="btn btn-primary" asp-action="Index">Cancelar</a>
-        </div>
-    </div>
-</form>
+    <form asp-action="Create" class="mt-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label asp-for="FechaVenta" class="control-label">Fecha de Venta</label>
+                <input asp-for="FechaVenta" class="form-control" />
+                <span asp-validation-for="FechaVenta" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="Correlativo" class="control-label">Correlativo</label>
+                <input asp-for="Correlativo" class="form-control" />
+                <span asp-validation-for="Correlativo" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label asp-for="Cliente" class="control-label">Cliente</label>
+                <input asp-for="Cliente" class="form-control" />
+                <span asp-validation-for="Cliente" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TotalVenta" class="control-label">Total de Venta</label>
+                <input readonly asp-for="TotalVenta" class="form-control" />
+                <span asp-validation-for="TotalVenta" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="detalles" class="control-label">Detalles de la Factura</label>
+                @await Html.PartialAsync("_DetFacturaVentas", Model.DetFacturaVenta)
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                <button type="submit" class="btn btn-primary">Crear</button>
+                <a href="@Url.Action("Index")" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
