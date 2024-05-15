@@ -19,3 +19,6 @@ namespace NotRealCoverWeb.Models
         public virtual IList<DetFacturaVentum> DetFacturaVenta { get; set; }
     }
 }
+
+
+//hahahahahahahahaha
